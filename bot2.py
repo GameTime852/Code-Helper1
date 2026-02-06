@@ -3,41 +3,42 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-TOKEN2 = os.getenv('TOKEN2')
-
+TOKEN = os.getenv('TOKEN2')
+# 1. Konfiguracja Intencji
 intents = discord.Intents.default()
-intents.message_content = True
+intents.message_content = True  # Niezbędne do czytania treści (!komenda)
+intents.dm_messages = True      # Niezbędne do otrzymywania zdarzeń z DM
 
-activity = discord.Activity(name='Programuję...', type=discord.ActivityType.watching)
-client = discord.Client(activity=activity, intents=intents)
-
-emoji = '👋'
-
-idRoli_menedzera = 1468680846637666385
-
+client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
     print(f'Zalogowano jako {client.user}')
+
 @client.event
 async def on_message(message):
+    # Ignoruj wiadomości od samego bota
     if message.author == client.user:
         return
-    if any(role.id == idRoli_menedzera for role in message.author.roles):
-            if message.content.lower().startswith('!stop'):
-                await message.channel.send(f'**{message.author.display_name}** zatrzymał bota!')
-                await client.close()
-    print(f'Otrzymano wiadomość od {message.author}: {message.content}')
-    if not message.author.bot:  
-        if message.content.startswith('!ping'):
-            await message.channel.send(f'Pong od {message.author}')
-        elif message.content.lower().startswith('cześć'):
-            await message.add_reaction(emoji)
-            await message.author.send('**Cześć!** 👋')
-            await message.channel.send(f'Cześć, **{message.author.display_name}**! Jak mogę Ci pomóc?')
-        elif message.content.lower().startswith('hej'):
-            await message.add_reaction(emoji)
-            await message.author.send('**Hej!** 👋')
-            await message.channel.send(f'Hej, **{message.author.display_name}**! Jak mogę Ci pomóc?')
 
-client.run(TOKEN2)
+    # SPRAWDZENIE: Czy wiadomość jest w DM?
+    # Najprostsza metoda: wiadomości w DM nie mają przypisanego serwera (guild)
+    is_dm = message.guild is None
+    
+    # Alternatywna metoda (bardziej ścisła):
+    # is_dm = isinstance(message.channel, discord.DMChannel)
+
+    if is_dm:
+        # Logika dla komend w DM
+        content = message.content.lower() # Ułatwia porównywanie
+
+        if content == '!pomoc':
+            await message.channel.send("Jesteśmy w DM! Oto lista komend...")
+        
+        elif content.startswith('!status'):
+            await message.channel.send("System sprawny.")
+            
+        else:
+            await message.channel.send("Nie rozpoznaję tej komendy w wiadomości prywatnej.")
+
+client.run(TOKEN)
