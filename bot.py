@@ -7,7 +7,6 @@ from discord.ext import commands
 import json
 import math
 from easy_pil import Editor, load_image, Font, Canvas
-import io
 
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
@@ -123,33 +122,31 @@ lista = zaladuj_wyniki()
 
 
 @bot.tree.command(name="lvl", description="Sprawdź swój poziom!")
-async def lvl(interaction: discord.Interaction, user: str = None):
+async def lvl(interaction: discord.Interaction, user: discord.Member = None):
     if user is None:
-        user_id = str(interaction.user.id)
-        name_usera = interaction.user.display_name
-    else:
-        name_usera = user
-
+        user = interaction.user
+    
+    user_id = str(user.id)
+    name_usera = user.display_name
+    
+    if user_id not in lista:
+        lista[user_id] = 0
+        
     xp_usera = lista[user_id]
 
-    awatar_img = load_image(interaction.user.display_avatar.url)
+    awatar_img = load_image(user.display_avatar.url)
     awatar = Editor(awatar_img).resize((250, 250)).circle_image()
-    tlo = Editor("images/image.png")
+    tlo = Editor("images/image.png") # Upewnij się, że ten plik istnieje
     tlo.paste(awatar, (125, 125))
 
-    profil_czcionki_1 = Font.poppins(size=100, variant="bold")
+    profil_czcionki_1 = Font.poppins(size=60, variant="bold")
     profil_czcionki_2 = Font.poppins(size=50, variant="light")
 
-    tlo.text((350, 450), str(name_usera), font = profil_czcionki_1, color="black")
-    tlo.text((700, 300), f"Poziom: {math.floor(xp_usera / 10)}", font = profil_czcionki_2, color="black")
+    tlo.text((125, 450), str(name_usera), font = profil_czcionki_1, color="black")
+    tlo.text((700, 375), f"Poziom: {math.floor(xp_usera / 10)}", font = profil_czcionki_2, color="black")
 
     plik = discord.File(fp = tlo.image_bytes, filename = "poziom.png")
     await interaction.response.send_message(file=plik)
-
-
-    lvl = lista[user_id] / 10
-    lvl10 = math.floor(lvl) 
-    await interaction.response.send_message(f'Cześć, **{name_usera}**! Masz poziom **{lvl10}**!')
 
 @bot.tree.command(name="heh", description="Wysyła 'he' określoną liczbę razy.")
 async def heh(interaction: discord.Interaction, count_heh: int = 5):
