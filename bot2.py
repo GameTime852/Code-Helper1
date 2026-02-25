@@ -1,44 +1,62 @@
-import discord
-import os
-from dotenv import load_dotenv
+# import discord
+# from discord.ext import commands
+# from dotenv import load_dotenv 
+# import os 
+# import json
 
-load_dotenv()
-TOKEN = os.getenv('TOKEN2')
-# 1. Konfiguracja Intencji
-intents = discord.Intents.default()
-intents.message_content = True  # Niezbędne do czytania treści (!komenda)
-intents.dm_messages = True      # Niezbędne do otrzymywania zdarzeń z DM
+# load_dotenv()
+# TOKEN = os.getenv("TOKEN2")
 
-client = discord.Client(intents=intents)
+# intents = discord.Intents.default()
+# intents.message_content = True
 
-@client.event
-async def on_ready():
-    print(f'Zalogowano jako {client.user}')
+# def zaladuj_wyniki():
+#     if os.path.exists("wyniki.txt"):
+#         try:
+#             with open("wyniki.txt", "r") as f:
+#                 return json.load(f)
+#         except (json.JSONDecodeError,ValueError):
+#             return {}
+#     return {}
+# def zapisz_wyniki():
+#     with open("wyniki.txt", "w") as f:
+#         json.dump(lista, f, indent = 4)
 
-@client.event
-async def on_message(message):
-    # Ignoruj wiadomości od samego bota
-    if message.author == client.user:
-        return
+# lista = zaladuj_wyniki()
 
-    # SPRAWDZENIE: Czy wiadomość jest w DM?
-    # Najprostsza metoda: wiadomości w DM nie mają przypisanego serwera (guild)
-    is_dm = message.guild is None
-    
-    # Alternatywna metoda (bardziej ścisła):
-    # is_dm = isinstance(message.channel, discord.DMChannel)
+# bot = commands.Bot(command_prefix='!', intents=intents)
 
-    if is_dm:
-        # Logika dla komend w DM
-        content = message.content.lower() # Ułatwia porównywanie
+# <@&1468670397762502902>.event
+# async def on_ready():
+#     print(f'Zalogowaliśmy się jako {bot.user}')
 
-        if content == '!pomoc':
-            await message.channel.send("Jesteśmy w DM! Oto lista komend...")
-        
-        elif content.startswith('!status'):
-            await message.channel.send("System sprawny.")
-            
-        else:
-            await message.channel.send("Nie rozpoznaję tej komendy w wiadomości prywatnej.")
+# <@&1468670397762502902>.command()
+# async def hej(ctx):
+#     await ctx.send(f'Cześć, jestem bot{bot.user}!')
 
-client.run(TOKEN)
+# <@&1468670397762502902>.event
+# async def on_message(message):
+#     if message.author.bot:
+#         return
+#     user_id = str(message.author.id)
+#     if user_id in lista:
+#         lista[user_id] += 1
+#     else:
+#         lista[user_id] = 1
+
+#     print(f"używkownik {message.author} ma teraz {lista[user_id]} punktów!")
+#     await bot.process_commands(message)
+
+# <@&1468670397762502902>.command()
+# async def lvl(ctx):
+#     user_id = str(ctx.author.id)
+#     await ctx.send(f'Czesc, masz poziom{lista[user_id]}!')
+
+# <@&1468670397762502902>.command()
+# async def heh(ctx, count_heh = 5):
+#     await ctx.send("he" * count_heh)
+
+# try:
+#     bot.run(TOKEN)
+# finally:
+#     zapisz_wyniki()
